@@ -37,7 +37,7 @@ locals {
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  region = "us-east-1"
 }
 
 data "http" "my_ip" {
@@ -51,7 +51,7 @@ data "aws_vpc" "default" {
 data "aws_ami" "amazon_linux_arm64" {
   most_recent = true
   filter {
-    name = "name"
+    name   = "name"
     values = ["amzn2-ami-hvm-2*"]
   }
   filter {
@@ -91,33 +91,32 @@ resource "aws_security_group" "sg" {
   description = "Allow SSH and HTTP"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge({name = "${random_string.random.result} - ${local.tags.purpose}"}, local.tags)
+  tags = merge({ name = "${random_string.random.result} - ${local.tags.purpose}" }, local.tags)
 
   ingress {
-      description      = "SSH from Internet"
-      from_port        = 22
-      to_port          = 22
-      protocol         = "tcp"
-      cidr_blocks      = ["${data.http.my_ip.body}/32"]
+    description = "SSH from Internet"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${data.http.my_ip.body}/32"]
   }
 
   ingress {
-      description      = "HTTP from Internet"
-      from_port        = 80
-      to_port          = 80
-      protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/0"]
+    description = "HTTP from Internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-      description      = "Internet access"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
+    description = "Internet access"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.amazon_linux_arm64.id
@@ -129,7 +128,7 @@ resource "aws_instance" "web" {
 
   user_data_base64 = base64encode(local.user_data)
 
-  tags = merge({name = "${random_string.random.result} - ${local.tags.purpose}"}, local.tags)
+  tags = merge({ name = "${random_string.random.result} - ${local.tags.purpose}" }, local.tags)
 }
 
 output "instance_id" {
