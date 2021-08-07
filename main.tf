@@ -94,7 +94,7 @@ resource "aws_security_group" "sg" {
   tags = merge({ name = "${random_string.random.result} - ${local.tags.purpose}" }, local.tags)
 
   ingress {
-    description = "SSH from Internet"
+    description = "SSH from TF IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
