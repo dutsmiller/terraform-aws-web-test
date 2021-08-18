@@ -128,7 +128,7 @@ resource "aws_instance" "web" {
 
   user_data_base64 = base64encode(local.user_data)
 
-  tags = merge({ name = "${random_string.random.result} - ${local.tags.purpose}" }, local.tags)
+  tags = merge({ Name = "${random_string.random.result} - ${local.tags.purpose}" }, local.tags)
 }
 
 output "instance_id" {
