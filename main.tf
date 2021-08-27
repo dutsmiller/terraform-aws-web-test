@@ -32,7 +32,32 @@ locals {
     </body>
     </html>
     EOF
+    cat <<"EOF" > /root/dynamic.sh
+    #!/bin/bash
+    while true
+    do
+    timestamp=`date`
+    cat <<DYNAMIC > /usr/share/nginx/html/dynamic.html
+    <html>
+    <body>
+    <div style="font-size: 5em;color: blue;text-align:center;font-weight:bold;">
+    Hello World!
+    </div>
+    <div style="font-size: 2em;color: blue;text-align:center;font-weight:bold;">
+    Welcome to AWS US-East-1
+    </div>
+    <div style="font-size: 2em;color: red;text-align:center;font-weight:bold;">
+    $timestamp
+    </div>
+    </body>
+    </html>
+    DYNAMIC
+    sleep 1
+    done
+    EOF
+    chmod +x /root/dynamic.sh
     systemctl start nginx
+    /root/dynamic.sh
   EOT
 }
 
@@ -118,6 +143,10 @@ resource "aws_security_group" "sg" {
   }
 }
 
+resource "aws_eip" "web" {
+  instance = aws_instance.web.id
+}
+
 resource "aws_instance" "web" {
   ami           = data.aws_ami.amazon_linux_arm64.id
   instance_type = "t4g.micro"
@@ -140,9 +169,9 @@ output "instance_name" {
 }
 
 output "ssh_command" {
-  value = "ssh -i web.pem ec2-user@${aws_instance.web.public_ip}"
+  value = "ssh -i web.pem ec2-user@${aws_eip.web.public_ip}"
 }
 
 output "http_url" {
-  value = "http://${aws_instance.web.public_ip}"
+  value = "http://${aws_eip.web.public_ip}"
 }
